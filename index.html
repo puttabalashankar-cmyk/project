@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoHelp AI — Smart Vehicle Breakdown Assistance</title>
+  <meta name="description" content="AI-Powered Multilingual Vehicle Breakdown Assistance for cars and motorcycles. Voice input, instant diagnosis in Telugu, Hindi & English, nearby mechanics, and fair cost estimation.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z'/></svg>">
+
+  <!-- Leaflet CSS for Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Emergency Announcement Bar -->
+  <div class="emergency-topbar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div>
+        <span class="topbar-badge">24/7 HELPLINE</span>
+        <span data-i18n="emergency_top">EMERGENCY BREAKDOWN HOTLINE: 1033 (National Highway) | 112 (Police & Medical)</span>
+      </div>
+      <div>
+        <a href="#safety">
+          <span class="pulse-dot"></span>
+          <span data-i18n="top_sos">SOS ALERT</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#home" class="brand-logo">
+        <div class="brand-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          AutoHelp <span>AI</span>
+          <span class="brand-tag" data-i18n="brand_sub">Smart Vehicle Breakdown Assistance</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="nav-link active" data-i18n="nav_home">Home</a></li>
+        <li><a href="#diagnose" class="nav-link" data-i18n="nav_diagnose">Diagnose</a></li>
+        <li><a href="#mechanics" class="nav-link" data-i18n="nav_mechanics">Mechanics</a></li>
+        <li><a href="#costs" class="nav-link" data-i18n="nav_costs">Cost Estimator</a></li>
+        <li><a href="#safety" class="nav-link" data-i18n="nav_safety">Safety & SOS</a></li>
+        <li><a href="#history" class="nav-link" id="btnNavHistory" data-i18n="nav_history">History</a></li>
+      </ul>
+
+      <!-- Nav Actions (Language & SOS) -->
+      <div class="nav-actions">
+        <!-- Multilingual Language Selector -->
+        <div class="lang-selector-wrap" title="Select Voice & Interface Language">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <select id="langSelect" class="lang-select" aria-label="Select Language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+          </select>
+        </div>
+
+        <a href="#safety" class="btn-sos">
+          <span class="pulse-dot"></span>
+          <span>SOS</span>
+        </a>
+
+        <!-- Mobile Menu Button -->
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-badge-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+              <span data-i18n="hero_badge">AI-Powered Multilingual Roadside Assistance</span>
+            </div>
+
+            <h1 class="hero-title">
+              <span data-i18n="hero_title_1">Instant Breakdown Help in</span><br>
+              <span class="highlight" data-i18n="hero_title_2">Your Own Language</span>
+            </h1>
+
+            <p class="hero-subtitle" data-i18n="hero_subtitle">
+              Stuck on the road? Speak or type your car or bike issues in Telugu, Hindi, or English. Get instant safe troubleshooting, cost estimates, and nearby mechanics.
+            </p>
+
+            <div class="hero-cta-group">
+              <a href="#diagnose" class="btn-primary" data-i18n="hero_btn_diagnose">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                </svg>
+                <span>Start Diagnosis Now</span>
+              </a>
+
+              <button type="button" class="btn-demo-badge" id="btnOpenDemoModal" data-i18n="hero_btn_demo">
+                <span>⚡ Try Hackathon Demo Scenarios</span>
+              </button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="hero-stats">
+              <div class="stat-item">
+                <span class="stat-num" data-i18n="hero_stat_1_num">3 Languages</span>
+                <span class="stat-label" data-i18n="hero_stat_1_lbl">English, Hindi & Telugu Speech</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-num" data-i18n="hero_stat_2_num">Safe Checks</span>
+                <span class="stat-label" data-i18n="hero_stat_2_lbl">Verified Roadside Protocols</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-num" data-i18n="hero_stat_3_num">Instant Maps</span>
+                <span class="stat-label" data-i18n="hero_stat_3_lbl">Live Nearby Garages & Towing</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Quick Symptom Selection Card -->
+          <div class="hero-card">
+            <div class="card-header-status">
+              <div class="card-title" data-i18n="hero_card_title">Quick Symptom Check</div>
+              <div class="live-indicator">
+                <span class="live-dot"></span>
+                <span>System Ready</span>
+              </div>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-muted);" data-i18n="hero_card_desc">
+              Select a common issue for 1-click diagnosis:
+            </p>
+
+            <div class="quick-breakdown-chips">
+              <button type="button" class="chip-btn" data-symptom="Engine overheating and steam rising from hood" data-i18n="chip_overheating">
+                Engine Overheating 🔥
+              </button>
+              <button type="button" class="chip-btn" data-symptom="Car won't start, rapid clicking sound from starter" data-i18n="chip_battery">
+                Dead Battery / No Start 🔋
+              </button>
+              <button type="button" class="chip-btn" data-symptom="Loud metal squeaking noise when applying brakes" data-i18n="chip_brakes">
+                Squealing Brakes 🛑
+              </button>
+              <button type="button" class="chip-btn" data-symptom="Flat tyre on highway, steering pulling to one side" data-i18n="chip_puncture">
+                Flat Tyre / Puncture 🛞
+              </button>
+              <button type="button" class="chip-btn" data-symptom="Dense white smoke coming from exhaust pipe" data-i18n="chip_smoke">
+                White Smoke from Exhaust 💨
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diagnosis Section -->
+    <section class="diagnose-section" id="diagnose">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag" data-i18n="diag_section_tag">AI Symptom Analysis</div>
+          <h2 class="section-title" data-i18n="diag_section_title">Diagnose Your Breakdown</h2>
+          <p class="section-desc" data-i18n="diag_section_desc">
+            Specify your vehicle, choose your preferred language, and speak or type the problem.
+          </p>
+        </div>
+
+        <div class="diagnose-grid">
+          <!-- Left: Input Form Card -->
+          <div class="card">
+            <!-- Step 1: Vehicle Selection -->
+            <div class="form-group">
+              <label class="form-label" data-i18n="vehicle_type">Vehicle Type</label>
+              <div class="vehicle-type-tabs">
+                <button type="button" id="tabCar" class="v-tab-btn active">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"></path>
+                    <circle cx="7" cy="17" r="2"></circle>
+                    <path d="M9 17h6"></path>
+                    <circle cx="17" cy="17" r="2"></circle>
+                  </svg>
+                  <span data-i18n="type_car">Car / 4-Wheeler</span>
+                </button>
+                <button type="button" id="tabBike" class="v-tab-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="5" cy="16" r="3"></circle>
+                    <circle cx="19" cy="16" r="3"></circle>
+                    <path d="M12 17h4l-3-7 4-3"></path>
+                    <path d="M9 17l3-7-3-3"></path>
+                  </svg>
+                  <span data-i18n="type_bike">Motorcycle / Scooter</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Brand & Model Input Row -->
+            <div class="input-row form-group">
+              <div>
+                <label class="form-label" data-i18n="brand_label">Vehicle Brand</label>
+                <select id="brandSelect" class="form-select">
+                  <option value="">-- Select Brand --</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" data-i18n="model_label">Model / Year</label>
+                <input type="text" id="modelInput" class="form-input" placeholder="e.g. Nexon / Swift / Classic 350">
+              </div>
+            </div>
+
+            <!-- Fuel Type Pills -->
+            <div class="form-group">
+              <label class="form-label" data-i18n="fuel_label">Fuel / Propulsion Type</label>
+              <div class="fuel-pills">
+                <button type="button" class="fuel-pill active" data-fuel="petrol" data-i18n="fuel_petrol">Petrol</button>
+                <button type="button" class="fuel-pill" data-fuel="diesel" data-i18n="fuel_diesel">Diesel</button>
+                <button type="button" class="fuel-pill" data-fuel="ev" data-i18n="fuel_ev">Electric (EV)</button>
+                <button type="button" class="fuel-pill" data-fuel="cng" data-i18n="fuel_cng">CNG / Hybrid</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Voice Input & Text Box -->
+            <div class="voice-input-wrapper">
+              <label class="form-label" data-i18n="symptom_label">Describe the Issue / Symptoms</label>
+
+              <!-- Prominent Mic Button -->
+              <button type="button" id="micBtn" class="mic-btn-center" aria-label="Toggle Voice Input">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+
+              <div id="micStatusText" class="mic-status-text" data-i18n="speak_instruction">
+                Press microphone to speak in selected language
+              </div>
+
+              <!-- Animated Sound Waveform -->
+              <div id="audioWaveform" class="audio-waveform">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+              </div>
+
+              <div class="symptom-textarea-box">
+                <textarea id="symptomInput" class="form-textarea" placeholder="E.g., Engine is overheating and coolant is steaming, or 'రన్నింగ్ లో కారు ఆగిపోయింది' / 'गाड़ी स्टार्ट नहीं हो रही है'..." data-i18n-placeholder="symptom_placeholder"></textarea>
+                <span id="charCounter" class="char-counter">0 / 500</span>
+              </div>
+            </div>
+
+            <!-- Run Diagnose Button -->
+            <button type="button" id="btnDiagnose" class="btn-diagnose">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span data-i18n="btn_run_diag">Analyse Vehicle Breakdown</span>
+            </button>
+          </div>
+
+          <!-- Right: AI Diagnosis Results Panel -->
+          <div class="result-panel" id="diagnosisResultPanel">
+            <!-- Idle / Placeholder State -->
+            <div class="result-placeholder">
+              <div class="placeholder-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--dark-bg); margin-bottom: 0.5rem;" data-i18n="diag_idle_title">
+                Awaiting Your Symptoms
+              </h3>
+              <p style="font-size: 0.95rem; max-width: 400px; margin: 0 auto;" data-i18n="diag_idle_desc">
+                Select your vehicle details and press Speak or type your problem to generate a safe roadside diagnosis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mechanics & Towing Finder Section -->
+    <section class="mechanics-section" id="mechanics">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag" data-i18n="mech_section_tag">Geolocation & Maps</div>
+          <h2 class="section-title" data-i18n="mech_section_title">Locate Nearby Mechanics & Towing</h2>
+          <p class="section-desc" data-i18n="mech_section_desc">
+            Permission-based GPS locating real workshops, distances, phone numbers, and driving directions.
+          </p>
+        </div>
+
+        <div class="mechanics-layout">
+          <!-- Left: Interactive Leaflet Map -->
+          <div class="map-container-card">
+            <div class="map-toolbar">
+              <div class="location-status">
+                <span class="live-dot" style="background-color: var(--primary);"></span>
+                <span id="locationStatusText" data-i18n="gps_locating">Acquiring GPS coordinates...</span>
+              </div>
+              <button type="button" id="btnRecenter" class="btn-locate">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span data-i18n="btn_recenter">Recenter on Me</span>
+              </button>
+            </div>
+            <!-- Map Container -->
+            <div id="map"></div>
+          </div>
+
+          <!-- Right: Filter Pills & Scrollable Mechanics List -->
+          <div class="mechanics-sidebar">
+            <div class="mechanic-filter-pills">
+              <button type="button" class="m-filter-btn active" data-filter="all" data-i18n="filter_all">All</button>
+              <button type="button" class="m-filter-btn" data-filter="247" data-i18n="filter_247">24/7 Roadside</button>
+              <button type="button" class="m-filter-btn" data-filter="cars" data-i18n="filter_cars">Car Specialists</button>
+              <button type="button" class="m-filter-btn" data-filter="bikes" data-i18n="filter_bikes">Bike Specialists</button>
+              <button type="button" class="m-filter-btn" data-filter="ev" data-i18n="filter_ev">EV Certified</button>
+              <button type="button" class="m-filter-btn" data-filter="towing" data-i18n="filter_towing">Towing Available</button>
+            </div>
+
+            <!-- Scrollable Mechanics Cards -->
+            <div class="mechanics-scroll-list" id="mechanicsScrollList">
+              <!-- Dynamically populated by js/mechanics.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Repair Cost Estimator Section -->
+    <section class="costs-section" id="costs">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag" data-i18n="cost_section_tag">Fair Pricing Guide</div>
+          <h2 class="section-title" data-i18n="cost_section_title">Repair Cost Estimator</h2>
+          <p class="section-desc" data-i18n="cost_section_desc">
+            Transparent estimates based on vehicle category and repair complexity. Clearly labeled estimates.
+          </p>
+        </div>
+
+        <div class="cost-calculator-card">
+          <div class="cost-calc-body">
+            <div class="calc-grid">
+              <!-- Vehicle Segment -->
+              <div>
+                <label class="form-label">Vehicle Category</label>
+                <select id="costVehicleSelect" class="form-select">
+                  <option value="hatchback">Hatchback (Swift, i10, WagonR)</option>
+                  <option value="sedan">Sedan (City, Verna, Dzire)</option>
+                  <option value="suv">SUV / MUV (Creta, Nexon, Brezza)</option>
+                  <option value="commuter_bike">Commuter Bike (Splendor, Activa)</option>
+                  <option value="premium_bike">Cruiser / 200cc+ (Enfield, Duke)</option>
+                  <option value="ev">Electric Vehicle (Car / 2W)</option>
+                </select>
+              </div>
+
+              <!-- Component System -->
+              <div>
+                <label class="form-label">Component System</label>
+                <select id="costComponentSelect" class="form-select">
+                  <option value="cooling">Engine Cooling & Radiator</option>
+                  <option value="battery">Battery & Starter Motor</option>
+                  <option value="brakes">Brake System (Pads, Discs)</option>
+                  <option value="tyres">Tyres, Wheels & Alignment</option>
+                  <option value="clutch">Clutch & Transmission</option>
+                  <option value="ac">Air Conditioning & Climate</option>
+                </select>
+              </div>
+
+              <!-- Repair Severity -->
+              <div>
+                <label class="form-label">Repair Complexity</label>
+                <select id="costSeveritySelect" class="form-select">
+                  <option value="minor">Minor Fix / Service / Flush</option>
+                  <option value="replace" selected>Component Replacement (OEM)</option>
+                  <option value="major">Major Overhaul / Rebuild</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Calculated Results Banner -->
+            <div class="cost-result-display">
+              <div class="cost-headline">
+                <span class="cost-headline-title" data-i18n="est_total_label">Estimated Total Range</span>
+                <span class="cost-total-amount" id="costDisplayTotal">₹2,600 – ₹5,700</span>
+              </div>
+              <div class="cost-breakdown-row">
+                <span data-i18n="parts_cost_label">Parts Cost Estimate:</span>
+                <strong id="costDisplayParts">₹1,800 – ₹4,200</strong>
+              </div>
+              <div class="cost-breakdown-row">
+                <span data-i18n="labor_cost_label">Labor & Service Charge:</span>
+                <strong id="costDisplayLabor">₹800 – ₹1,500</strong>
+              </div>
+              <div class="cost-breakdown-row">
+                <span data-i18n="est_time_label">Estimated Repair Time:</span>
+                <strong id="costDisplayTime">3 – 5 Hours</strong>
+              </div>
+            </div>
+
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem; line-height: 1.4;" data-i18n="cost_disclaimer">
+              Note: These figures reflect regional market averages in INR (₹). Actual workshop quotes may vary depending on OEM vs aftermarket spares and garage tier.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Emergency Safety & SOS Section -->
+    <section class="safety-section" id="safety">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag" style="background: #fee2e2; color: #dc2626;" data-i18n="safety_section_tag">Emergency Protocols</div>
+          <h2 class="section-title" data-i18n="safety_section_title">Emergency Roadside Safety</h2>
+          <p class="section-desc" data-i18n="safety_section_desc">
+            Critical safety measures to prevent secondary accidents during highway or road breakdowns.
+          </p>
+        </div>
+
+        <div class="safety-grid">
+          <!-- SOS Actions Card -->
+          <div class="sos-action-card">
+            <div class="sos-title">
+              <span class="pulse-dot" style="background-color: #ef4444;"></span>
+              <span data-i18n="sos_action_title">Immediate SOS Assistance</span>
+            </div>
+
+            <div class="emergency-btn-grid">
+              <a href="tel:112" class="btn-emergency-call">
+                <span class="call-title" data-i18n="call_112">National Emergency Helpline</span>
+                <span class="call-num">📞 112</span>
+              </a>
+              <a href="tel:1033" class="btn-emergency-call">
+                <span class="call-title" data-i18n="call_1033">Highway Patrol Helpline</span>
+                <span class="call-num">📞 1033</span>
+              </a>
+            </div>
+
+            <div class="sos-tools-row">
+              <button type="button" id="btnStrobe" class="btn-strobe">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span data-i18n="btn_strobe_text">Screen SOS Strobe (Night Safety)</span>
+              </button>
+
+              <a href="#" id="btnShareLocation" class="btn-share-loc">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z"></path>
+                </svg>
+                <span data-i18n="btn_share_loc_text">Share GPS on WhatsApp</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Safety Protocols Checklist Card -->
+          <div class="checklist-card">
+            <div class="checklist-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span data-i18n="checklist_title">5 Golden Rules for Breakdown Safety</span>
+            </div>
+
+            <ul class="rules-list">
+              <li class="rule-item">
+                <div class="rule-icon">1</div>
+                <div data-i18n="rule_1">Turn ON Hazard Warning Lights immediately to alert traffic.</div>
+              </li>
+              <li class="rule-item">
+                <div class="rule-icon">2</div>
+                <div data-i18n="rule_2">Guide vehicle smoothly to the furthest left shoulder or safe curb.</div>
+              </li>
+              <li class="rule-item">
+                <div class="rule-icon">3</div>
+                <div data-i18n="rule_3">Place Reflective Warning Triangle 45-50 meters behind your vehicle.</div>
+              </li>
+              <li class="rule-item">
+                <div class="rule-icon">4</div>
+                <div data-i18n="rule_4">Never stand behind the car or on the road; stay behind highway guardrails.</div>
+              </li>
+              <li class="rule-item">
+                <div class="rule-icon">5</div>
+                <div data-i18n="rule_5">Exit vehicle safely using the passenger-side door away from traffic flow.</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Demo Scenarios Modal -->
+  <div class="modal-overlay" id="demoModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" id="btnCloseDemoModal">&times;</button>
+      <div class="modal-title" data-i18n="demo_modal_title">Hackathon Demo Scenarios</div>
+      <div class="modal-desc" data-i18n="demo_modal_desc">
+        Click any pre-configured scenario to demonstrate instant multilingual speech and diagnosis:
+      </div>
+      <div id="demoScenariosList">
+        <!-- Rendered by js/app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Session History Modal -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close-btn" id="btnCloseHistoryModal">&times;</button>
+      <div class="modal-title" data-i18n="history_title">Recent Diagnoses (This Session)</div>
+      <div id="historyListContainer" style="margin-top: 1rem;">
+        <!-- Rendered by js/app.js -->
+      </div>
+      <div style="margin-top: 1.5rem; text-align: right;">
+        <button type="button" id="btnClearHistory" class="btn-secondary" style="font-size: 0.85rem;" data-i18n="btn_clear_history">
+          Clear History
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Night SOS Screen Strobe Overlay -->
+  <div id="strobeOverlay" class="strobe-screen" title="Tap anywhere to stop strobe flasher">
+    <div class="strobe-exit-text">⚠️ EMERGENCY FLASHING — TAP TO EXIT</div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">AutoHelp AI</div>
+          <p class="footer-desc">
+            Smart Vehicle Breakdown Assistance for College Hackathon.<br>
+            Empowering drivers and riders with multilingual voice AI, safe diagnostics, and verified roadside mechanics in Telugu, Hindi & English.
+          </p>
+        </div>
+        <div>
+          <div class="footer-heading">Emergency Hotlines</div>
+          <ul class="footer-links">
+            <li><a href="tel:112">112 — National Emergency</a></li>
+            <li><a href="tel:1033">1033 — National Highway Patrol</a></li>
+            <li><a href="tel:108">108 — Ambulance Helpline</a></li>
+            <li><a href="tel:1073">1073 — Road Accident Emergency</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Hackathon Features</div>
+          <ul class="footer-links">
+            <li>Multilingual Speech-to-Text (STT)</li>
+            <li>Text-to-Speech (TTS) Voice Reader</li>
+            <li>Leaflet GPS Mechanic Locator</li>
+            <li>Transparent Cost Estimator</li>
+            <li>Night Safety Strobe & WhatsApp SOS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 AutoHelp AI — Built for College Hackathon. Safe Roadside Innovation.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Application Modules -->
+  <script src="js/i18n.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/ai-engine.js"></script>
+  <script src="js/mechanics.js"></script>
+  <script src="js/costs.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
